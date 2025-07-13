@@ -1,0 +1,13 @@
+server:
+  port: 8080 # Porta padr�o para o seu servi�o de personagens. Altere se houver conflito com outros servi�os.
+
+spring:
+  application:
+    name: character-service
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/sheet-crud # Sua URL do MongoDB. Certifique-se de que a porta e o nome do banco est�o corretos.
+      database: sheet-crud # Nome do banco de dados para suas fichas de personagem
+
+app:
+  templates-service-url: http://localhost:8000/api/templates/ # URL do seu servi�o de templates Python

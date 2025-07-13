@@ -1,0 +1,93 @@
+package com.rpgsheets.characterservice.model;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
+// DTO (Data Transfer Object) para representar a estrutura de resposta do seu serviço de templates Python
+public class TemplateResponse {
+    private String id;
+    private String systemName;
+    private String version;
+    private List<TemplateField> fields; // Lista de campos definidos no template
+    private Map<String, Object> templateJson; // Para o JSON bruto do template, se necessário
+
+    // Construtor padrão
+    public TemplateResponse() {
+    }
+
+    // Construtor completo
+    public TemplateResponse(String id, String systemName, String version, List<TemplateField> fields, Map<String, Object> templateJson) {
+        this.id = id;
+        this.systemName = systemName;
+        this.version = version;
+        this.fields = fields;
+        this.templateJson = templateJson;
+    }
+
+    // --- Getters e Setters ---
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getSystemName() {
+        return systemName;
+    }
+
+    public void setSystemName(String systemName) {
+        this.systemName = systemName;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
+    }
+
+    public List<TemplateField> getFields() {
+        return fields;
+    }
+
+    public void setFields(List<TemplateField> fields) {
+        this.fields = fields;
+    }
+
+    public Map<String, Object> getTemplateJson() {
+        return templateJson;
+    }
+
+    public void setTemplateJson(Map<String, Object> templateJson) {
+        this.templateJson = templateJson;
+    }
+
+    // --- Métodos equals, hashCode e toString ---
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TemplateResponse that = (TemplateResponse) o;
+        return Objects.equals(id, that.id) && Objects.equals(systemName, that.systemName) && Objects.equals(version, that.version) && Objects.equals(fields, that.fields) && Objects.equals(templateJson, that.templateJson);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, systemName, version, fields, templateJson);
+    }
+
+    @Override
+    public String toString() {
+        return "TemplateResponse{" +
+                "id='" + id + '\'' +
+                ", systemName='" + systemName + '\'' +
+                ", version='" + version + '\'' +
+                ", fields=" + fields +
+                ", templateJson=" + templateJson +
+                '}';
+    }
+}
