@@ -3,18 +3,18 @@ package com.rpgsheets.characterservice.config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
-@Configuration // classe configurações
+@Configuration
 public class ApplicationConfig {
 
-    @Value("${app.templates-service-url}") // Injeta o valor da propriedade do application.yml
-    private String templatesServiceUrl;
+    // URL do seu serviço de Fichas Python (CRUD de Fichas)
+    @Value("${app.sheets-service-url}")
+    private String sheetsServiceUrl;
 
-    // Getters e Setters para templatesServiceUrl
-    public String getTemplatesServiceUrl() {
-        return templatesServiceUrl;
+    public String getSheetsServiceUrl() {
+        return sheetsServiceUrl;
     }
 
-    public void setTemplatesServiceUrl(String templatesServiceUrl) {
-        this.templatesServiceUrl = templatesServiceUrl;
+    public void setSheetsServiceUrl(String sheetsServiceUrl) {
+        this.sheetsServiceUrl = sheetsServiceUrl;
     }
 }

@@ -1,19 +1,16 @@
 package com.rpgsheets.characterservice.service;
 
-// Certifique-se de que APENAS estas importações estão ativas para o TemplateService para este teste
+// NÃO TENHA AQUI import com.rpgsheets.characterservice.config.ApplicationConfig;
 import com.rpgsheets.characterservice.exception.ResourceNotFoundException;
-import com.rpgsheets.characterservice.model.Template;
-import com.rpgsheets.characterservice.model.TemplateResponse;
-import com.rpgsheets.characterservice.repository.TemplateRepository;
 import org.springframework.stereotype.Service;
+// NÃO TENHA AQUI import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 @Service
 public class TemplateService {
-
     private final TemplateRepository templateRepository;
 
-    // O construtor deve injetar APENAS o TemplateRepository para este teste
+    // Construtor deve ter APENAS TemplateRepository
     public TemplateService(TemplateRepository templateRepository) {
         this.templateRepository = templateRepository;
     }
