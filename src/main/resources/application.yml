@@ -1,8 +1,0 @@
-server.port=8080 # Porta para o seu serviço de personagens Java
-
-spring.application.name=character-service
-spring.data.mongodb.uri=mongodb://localhost:27017/characterdb # Altere para o seu URI completo do MongoDB se for Atlas
-spring.data.mongodb.database=characterdb # Nome do banco de dados para seus PERSONAGENS no MongoDB do Java
-  
-  # URL do seu serviço de Fichas Python (FastAPI), rodando na porta 8001
-app.sheets-service-url=http://localhost:8001/api/sheets/
