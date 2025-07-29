@@ -1,8 +1,15 @@
 package com.solo.rpg.characterservice.controller;
 
 import com.solo.rpg.characterservice.model.Personagem;
-import com.solo.rpg.characterservice.model.PersonagemCreateRequest; // Importe esta nova classe
+import com.solo.rpg.characterservice.model.PersonagemCreateRequest;
 import com.solo.rpg.characterservice.service.PersonagemService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,87 +20,122 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-@RestController // Indica que esta classe é um controlador REST
-@RequestMapping("/api/characters") // Define o prefixo base para todos os endpoints neste controller
+@RestController
+@RequestMapping("/api/characters")
+@Tag(name = "Personagem Controller", description = "Endpoints para gerenciamento de personagens de RPG")
 public class PersonagemController {
 
     private final PersonagemService personagemService;
 
-    // Injeção de dependência do serviço
     @Autowired
     public PersonagemController(PersonagemService personagemService) {
         this.personagemService = personagemService;
     }
 
-    // Endpoint para CRIAR um novo personagem
-    // Aceita um PersonagemCreateRequest com ownerId, nomePersonagem e fichaId
+    @Operation(summary = "Criar um novo personagem",
+            description = "Cria um novo personagem com os dados fornecidos")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Personagem criado com sucesso",
+                    content = @Content(schema = @Schema(implementation = Personagem.class))),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos fornecidos"),
+            @ApiResponse(responseCode = "500", description = "Erro interno no servidor")
+    })
     @PostMapping
     public ResponseEntity<Personagem> createPersonagem(@RequestBody PersonagemCreateRequest request) {
         try {
             Personagem novoPersonagem = personagemService.createPersonagem(request);
-            return new ResponseEntity<>(novoPersonagem, HttpStatus.CREATED); // Retorna 201 Created
+            return new ResponseEntity<>(novoPersonagem, HttpStatus.CREATED);
         } catch (ResponseStatusException e) {
-            // Re-lança exceções do serviço que já contêm status HTTP (ex: BAD_REQUEST)
             throw e;
         } catch (Exception e) {
-            // Captura outras exceções inesperadas e retorna 500 Internal Server Error
-            e.printStackTrace(); // Imprime o stack trace no console para depuração
+            e.printStackTrace();
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Erro ao criar personagem: " + e.getMessage());
         }
     }
 
-    // Endpoint para BUSCAR um personagem pelo ID
+    @Operation(summary = "Obter um personagem por ID",
+            description = "Retorna os detalhes de um personagem específico")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Personagem encontrado",
+                    content = @Content(schema = @Schema(implementation = Personagem.class))),
+            @ApiResponse(responseCode = "404", description = "Personagem não encontrado")
+    })
     @GetMapping("/{id}")
-    public ResponseEntity<Personagem> getPersonagemById(@PathVariable String id) {
+    public ResponseEntity<Personagem> getPersonagemById(
+            @Parameter(description = "ID do personagem a ser buscado", required = true)
+            @PathVariable String id) {
         Optional<Personagem> personagem = personagemService.getPersonagemById(id);
-        // Retorna 200 OK se encontrado, ou 404 Not Found se não encontrado
         return personagem.map(p -> new ResponseEntity<>(p, HttpStatus.OK))
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Personagem não encontrado"));
     }
 
-    // Endpoint para LISTAR TODOS os personagens
+    @Operation(summary = "Listar todos os personagens",
+            description = "Retorna uma lista de todos os personagens cadastrados")
+    @ApiResponse(responseCode = "200", description = "Lista de personagens retornada com sucesso",
+            content = @Content(schema = @Schema(implementation = Personagem.class)))
     @GetMapping
     public ResponseEntity<List<Personagem>> getAllPersonagens() {
         List<Personagem> personagens = personagemService.getAllPersonagens();
         return new ResponseEntity<>(personagens, HttpStatus.OK);
     }
 
-    // Endpoint para LISTAR personagens por ID do proprietário (ownerId)
+    @Operation(summary = "Listar personagens por proprietário",
+            description = "Retorna todos os personagens associados a um determinado ownerId")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Personagens encontrados",
+                    content = @Content(schema = @Schema(implementation = Personagem.class))),
+            @ApiResponse(responseCode = "404", description = "Nenhum personagem encontrado para o proprietário")
+    })
     @GetMapping("/by-owner/{ownerId}")
-    public ResponseEntity<List<Personagem>> getPersonagensByOwnerId(@PathVariable String ownerId) {
+    public ResponseEntity<List<Personagem>> getPersonagensByOwnerId(
+            @Parameter(description = "ID do proprietário dos personagens", required = true)
+            @PathVariable String ownerId) {
         List<Personagem> personagens = personagemService.getPersonagensByOwnerId(ownerId);
-        // Pode retornar uma lista vazia ou 404, dependendo da sua preferência.
-        // Aqui, optei por 404 se não houver nenhum personagem para o ownerId.
         if (personagens.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Nenhum personagem encontrado para o proprietário: " + ownerId);
         }
         return new ResponseEntity<>(personagens, HttpStatus.OK);
     }
 
-    // Endpoint para ATUALIZAR um personagem pelo ID
-    // O RequestBody é um Map<String, Object> para flexibilidade, permitindo atualização parcial
+    @Operation(summary = "Atualizar um personagem",
+            description = "Atualiza parcial ou totalmente os dados de um personagem existente")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Personagem atualizado com sucesso",
+                    content = @Content(schema = @Schema(implementation = Personagem.class))),
+            @ApiResponse(responseCode = "400", description = "Dados de atualização inválidos ou vazios"),
+            @ApiResponse(responseCode = "404", description = "Personagem não encontrado")
+    })
     @PutMapping("/{id}")
-    public ResponseEntity<Personagem> updatePersonagem(@PathVariable String id, @RequestBody Map<String, Object> updateData) {
+    public ResponseEntity<Personagem> updatePersonagem(
+            @Parameter(description = "ID do personagem a ser atualizado", required = true)
+            @PathVariable String id,
+            @Parameter(description = "Dados de atualização no formato chave-valor")
+            @RequestBody Map<String, Object> updateData) {
         if (updateData == null || updateData.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nenhum dado para atualizar fornecido");
         }
 
         Personagem updatedPersonagem = personagemService.updatePersonagem(id, updateData);
         if (updatedPersonagem == null) {
-            // Retorna 404 Not Found se o personagem não for encontrado pelo ID
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Personagem não encontrado ou nenhum dado foi alterado");
         }
         return new ResponseEntity<>(updatedPersonagem, HttpStatus.OK);
     }
 
-    // Endpoint para DELETAR um personagem pelo ID
+    @Operation(summary = "Excluir um personagem",
+            description = "Remove permanentemente um personagem do sistema")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Personagem excluído com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Personagem não encontrado")
+    })
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletePersonagem(@PathVariable String id) {
+    public ResponseEntity<Void> deletePersonagem(
+            @Parameter(description = "ID do personagem a ser excluído", required = true)
+            @PathVariable String id) {
         boolean deleted = personagemService.deletePersonagem(id);
         if (!deleted) {
-            // Retorna 404 Not Found se o personagem não for encontrado pelo ID
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Personagem não encontrado");
         }
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT); // Retorna 204 No Content para deleção bem-sucedida
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
