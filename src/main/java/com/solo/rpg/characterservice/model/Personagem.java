@@ -1,24 +1,32 @@
 package com.solo.rpg.characterservice.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Document(collection = "personagens") // Indica que mapeia para a coleção "personagens" no MongoDB
+import java.util.Objects;
+
+@Document(collection = "personagens")
 public class Personagem {
 
-    @Id // Marca este campo como o ID do documento no MongoDB (_id)
-    private String id; // ID ÚNICO deste objeto Personagem (gerado pelo banco de dados/aplicação)
-    private String ownerId; // ID do usuário que possui este personagem (para filtrar por usuário)
-    private String nomePersonagem; // Nome do personagem (para identificação)
-
-    // Referência cruzada: ID da ficha associada a este personagem, que vive no serviço Python de Fichas
+    @Id
+    private String id;
+    private String ownerId;
+    private String nomePersonagem;
     private String fichaId;
+    private String historia; // NOVO CAMPO
+    private String imagem;   // NOVO CAMPO
+
+    public Personagem() {
+    }
+
+    public Personagem(String id, String ownerId, String nomePersonagem, String fichaId, String historia, String imagem) {
+        this.id = id;
+        this.ownerId = ownerId;
+        this.nomePersonagem = nomePersonagem;
+        this.fichaId = fichaId;
+        this.historia = historia;
+        this.imagem = imagem;
+    }
 
     public String getId() {
         return id;
@@ -50,5 +58,46 @@ public class Personagem {
 
     public void setFichaId(String fichaId) {
         this.fichaId = fichaId;
+    }
+
+    public String getHistoria() {
+        return historia;
+    }
+
+    public void setHistoria(String historia) {
+        this.historia = historia;
+    }
+
+    public String getImagem() {
+        return imagem;
+    }
+
+    public void setImagem(String imagem) {
+        this.imagem = imagem;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Personagem that = (Personagem) o;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
+    @Override
+    public String toString() {
+        return "Personagem{" +
+                "id='" + id + '\'' +
+                ", ownerId='" + ownerId + '\'' +
+                ", nomePersonagem='" + nomePersonagem + '\'' +
+                ", fichaId='" + fichaId + '\'' +
+                ", historia='" + historia + '\'' +
+                ", imagem='" + imagem + '\'' +
+                '}';
     }
 }

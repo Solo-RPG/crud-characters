@@ -1,17 +1,22 @@
 package com.solo.rpg.characterservice.model;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
-
-// DTO para a requisição de criação de Personagem
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class PersonagemCreateRequest {
     private String ownerId;
     private String nomePersonagem;
-    private String fichaId; // Opcional, se a ficha puder ser atribuída depois
+    private String fichaId;
+    private String historia; // NOVO CAMPO
+    private String imagem;   // NOVO CAMPO
+
+    public PersonagemCreateRequest() {
+    }
+
+    public PersonagemCreateRequest(String ownerId, String nomePersonagem, String fichaId, String historia, String imagem) {
+        this.ownerId = ownerId;
+        this.nomePersonagem = nomePersonagem;
+        this.fichaId = fichaId;
+        this.historia = historia;
+        this.imagem = imagem;
+    }
 
     public String getOwnerId() {
         return ownerId;
@@ -35,5 +40,21 @@ public class PersonagemCreateRequest {
 
     public void setFichaId(String fichaId) {
         this.fichaId = fichaId;
+    }
+
+    public String getHistoria() {
+        return historia;
+    }
+
+    public void setHistoria(String historia) {
+        this.historia = historia;
+    }
+
+    public String getImagem() {
+        return imagem;
+    }
+
+    public void setImagem(String imagem) {
+        this.imagem = imagem;
     }
 }

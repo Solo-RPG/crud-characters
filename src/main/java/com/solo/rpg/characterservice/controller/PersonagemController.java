@@ -3,13 +3,13 @@ package com.solo.rpg.characterservice.controller;
 import com.solo.rpg.characterservice.model.Personagem;
 import com.solo.rpg.characterservice.model.PersonagemCreateRequest;
 import com.solo.rpg.characterservice.service.PersonagemService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation; // Mantendo para Swagger, mesmo sem Lombok
+import io.swagger.v3.oas.annotations.Parameter; // Mantendo para Swagger
+import io.swagger.v3.oas.annotations.media.Content; // Mantendo para Swagger
+import io.swagger.v3.oas.annotations.media.Schema; // Mantendo para Swagger
+import io.swagger.v3.oas.annotations.responses.ApiResponse; // Mantendo para Swagger
+import io.swagger.v3.oas.annotations.responses.ApiResponses; // Mantendo para Swagger
+import io.swagger.v3.oas.annotations.tags.Tag; // Mantendo para Swagger
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,7 +33,7 @@ public class PersonagemController {
     }
 
     @Operation(summary = "Criar um novo personagem",
-            description = "Cria um novo personagem com os dados fornecidos")
+            description = "Cria um novo personagem com os dados fornecidos. A ligação com a ficha é opcional na criação.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Personagem criado com sucesso",
                     content = @Content(schema = @Schema(implementation = Personagem.class))),
@@ -46,10 +46,11 @@ public class PersonagemController {
             Personagem novoPersonagem = personagemService.createPersonagem(request);
             return new ResponseEntity<>(novoPersonagem, HttpStatus.CREATED);
         } catch (ResponseStatusException e) {
+            e.printStackTrace();
             throw e;
         } catch (Exception e) {
             e.printStackTrace();
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Erro ao criar personagem: " + e.getMessage());
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Erro inesperado ao criar personagem: " + e.getMessage());
         }
     }
 
@@ -121,6 +122,33 @@ public class PersonagemController {
         }
         return new ResponseEntity<>(updatedPersonagem, HttpStatus.OK);
     }
+
+    @Operation(summary = "Vincular ficha a um personagem",
+            description = "Associa um fichaId a um personagem existente. Ideal para vincular fichas criadas separadamente.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Ficha vinculada com sucesso",
+                    content = @Content(schema = @Schema(implementation = Personagem.class))),
+            @ApiResponse(responseCode = "404", description = "Personagem não encontrado"),
+            @ApiResponse(responseCode = "500", description = "Erro interno ao vincular ficha")
+    })
+    @PutMapping("/{personagemId}/assign-ficha/{fichaId}")
+    public ResponseEntity<Personagem> assignFichaToPersonagem(
+            @Parameter(description = "ID do personagem a ser atualizado", required = true)
+            @PathVariable String personagemId,
+            @Parameter(description = "ID da ficha a ser vinculada ao personagem", required = true)
+            @PathVariable String fichaId) {
+        try {
+            Personagem updatedPersonagem = personagemService.assignFichaToPersonagem(personagemId, fichaId);
+            return new ResponseEntity<>(updatedPersonagem, HttpStatus.OK);
+        } catch (ResponseStatusException e) {
+            e.printStackTrace();
+            throw e;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Erro ao vincular ficha ao personagem: " + e.getMessage());
+        }
+    }
+
 
     @Operation(summary = "Excluir um personagem",
             description = "Remove permanentemente um personagem do sistema")
