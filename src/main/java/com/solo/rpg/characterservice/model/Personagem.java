@@ -19,4 +19,36 @@ public class Personagem {
 
     // Referência cruzada: ID da ficha associada a este personagem, que vive no serviço Python de Fichas
     private String fichaId;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getOwnerId() {
+        return ownerId;
+    }
+
+    public void setOwnerId(String ownerId) {
+        this.ownerId = ownerId;
+    }
+
+    public String getNomePersonagem() {
+        return nomePersonagem;
+    }
+
+    public void setNomePersonagem(String nomePersonagem) {
+        this.nomePersonagem = nomePersonagem;
+    }
+
+    public String getFichaId() {
+        return fichaId;
+    }
+
+    public void setFichaId(String fichaId) {
+        this.fichaId = fichaId;
+    }
 }
