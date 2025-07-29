@@ -5,27 +5,18 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
 
-import java.util.Map;
-
-// Anotações Lombok para getters, setters, construtores, toString, etc.
-@Data // Gera getters, setters, toString, equals e hashCode
-@NoArgsConstructor // Gera construtor sem argumentos
-@AllArgsConstructor // Gera construtor com todos os argumentos
-@Document(collection = "personagens") // Mapeia para a coleção "personagens" no MongoDB
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Document(collection = "personagens") // Indica que mapeia para a coleção "personagens" no MongoDB
 public class Personagem {
 
-    @Id // Marca o campo como ID do documento no MongoDB (_id)
-    private String id; // O MongoDB usa _id, que o Spring Data mapeia para "id" por padrão
+    @Id // Marca este campo como o ID do documento no MongoDB (_id)
+    private String id; // ID ÚNICO deste objeto Personagem (gerado pelo banco de dados/aplicação)
+    private String ownerId; // ID do usuário que possui este personagem (para filtrar por usuário)
+    private String nomePersonagem; // Nome do personagem (para identificação)
 
-    private String templateId; // ID do template de RPG usado (ex: D&D 5e)
-    private String templateSystemName; // Nome do sistema de RPG (ex: "D&D 5e")
-    private String templateSystemVersion; // Versão do sistema de RPG (ex: "1.0")
-    private String ownerId; // ID do dono do personagem (usuário)
-
-
-    private Map<String, Object> data; // Dados dinâmicos do personagem
-
-
+    // Referência cruzada: ID da ficha associada a este personagem, que vive no serviço Python de Fichas
+    private String fichaId;
 }

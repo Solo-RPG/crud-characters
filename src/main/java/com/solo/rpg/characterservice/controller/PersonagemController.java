@@ -1,6 +1,7 @@
 package com.solo.rpg.characterservice.controller;
 
 import com.solo.rpg.characterservice.model.Personagem;
+import com.solo.rpg.characterservice.model.PersonagemCreateRequest; // Importe esta nova classe
 import com.solo.rpg.characterservice.service.PersonagemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,67 +25,53 @@ public class PersonagemController {
         this.personagemService = personagemService;
     }
 
-    // POST /api/characters/
+    // Endpoint para CRIAR um novo personagem
+    // Aceita um PersonagemCreateRequest com ownerId, nomePersonagem e fichaId
     @PostMapping
-    public ResponseEntity<Personagem> createPersonagem(@RequestBody Map<String, Object> request) {
-        // Normalização dos dados, como feito no seu sheets.py
-        String templateId = (String) request.get("template_id");
-        String systemName = (String) request.get("system_name");
-        String ownerId = (String) request.get("owner_id");
-        Map<String, Object> fields = (Map<String, Object>) request.get("fields");
-
-        // Validações básicas (replicando as do Python)
-        if ((templateId == null || templateId.isEmpty()) && (systemName == null || systemName.isEmpty())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Pelo menos um identificador (template_id ou system_name) deve ser fornecido");
-        }
-        if (ownerId == null || ownerId.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "owner_id é obrigatório");
-        }
-        if (fields == null || fields.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "fields não pode ser vazio");
-        }
-        if (!(fields instanceof Map)) { // Verifica se é um dicionário/mapa
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "fields deve ser um dicionário");
-        }
-
+    public ResponseEntity<Personagem> createPersonagem(@RequestBody PersonagemCreateRequest request) {
         try {
-            Personagem novoPersonagem = personagemService.createPersonagem(ownerId, templateId, systemName, fields);
+            Personagem novoPersonagem = personagemService.createPersonagem(request);
             return new ResponseEntity<>(novoPersonagem, HttpStatus.CREATED); // Retorna 201 Created
         } catch (ResponseStatusException e) {
-            throw e; // Re-lança a exceção HTTP já com o status correto
+            // Re-lança exceções do serviço que já contêm status HTTP (ex: BAD_REQUEST)
+            throw e;
         } catch (Exception e) {
-            // Log do erro completo para depuração
-            e.printStackTrace();
+            // Captura outras exceções inesperadas e retorna 500 Internal Server Error
+            e.printStackTrace(); // Imprime o stack trace no console para depuração
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Erro ao criar personagem: " + e.getMessage());
         }
     }
 
-    // GET /api/characters/{id}
+    // Endpoint para BUSCAR um personagem pelo ID
     @GetMapping("/{id}")
     public ResponseEntity<Personagem> getPersonagemById(@PathVariable String id) {
         Optional<Personagem> personagem = personagemService.getPersonagemById(id);
+        // Retorna 200 OK se encontrado, ou 404 Not Found se não encontrado
         return personagem.map(p -> new ResponseEntity<>(p, HttpStatus.OK))
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Personagem não encontrado"));
     }
 
-    // GET /api/characters/
+    // Endpoint para LISTAR TODOS os personagens
     @GetMapping
     public ResponseEntity<List<Personagem>> getAllPersonagens() {
         List<Personagem> personagens = personagemService.getAllPersonagens();
         return new ResponseEntity<>(personagens, HttpStatus.OK);
     }
 
-    // GET /api/characters/by-owner/{ownerId}
+    // Endpoint para LISTAR personagens por ID do proprietário (ownerId)
     @GetMapping("/by-owner/{ownerId}")
     public ResponseEntity<List<Personagem>> getPersonagensByOwnerId(@PathVariable String ownerId) {
         List<Personagem> personagens = personagemService.getPersonagensByOwnerId(ownerId);
+        // Pode retornar uma lista vazia ou 404, dependendo da sua preferência.
+        // Aqui, optei por 404 se não houver nenhum personagem para o ownerId.
         if (personagens.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Nenhum personagem encontrado para o proprietário: " + ownerId);
         }
         return new ResponseEntity<>(personagens, HttpStatus.OK);
     }
 
-    // PUT /api/characters/{id}
+    // Endpoint para ATUALIZAR um personagem pelo ID
+    // O RequestBody é um Map<String, Object> para flexibilidade, permitindo atualização parcial
     @PutMapping("/{id}")
     public ResponseEntity<Personagem> updatePersonagem(@PathVariable String id, @RequestBody Map<String, Object> updateData) {
         if (updateData == null || updateData.isEmpty()) {
@@ -93,16 +80,18 @@ public class PersonagemController {
 
         Personagem updatedPersonagem = personagemService.updatePersonagem(id, updateData);
         if (updatedPersonagem == null) {
+            // Retorna 404 Not Found se o personagem não for encontrado pelo ID
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Personagem não encontrado ou nenhum dado foi alterado");
         }
         return new ResponseEntity<>(updatedPersonagem, HttpStatus.OK);
     }
 
-    // DELETE /api/characters/{id}
+    // Endpoint para DELETAR um personagem pelo ID
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePersonagem(@PathVariable String id) {
         boolean deleted = personagemService.deletePersonagem(id);
         if (!deleted) {
+            // Retorna 404 Not Found se o personagem não for encontrado pelo ID
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Personagem não encontrado");
         }
         return new ResponseEntity<>(HttpStatus.NO_CONTENT); // Retorna 204 No Content para deleção bem-sucedida

@@ -7,13 +7,11 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
-@Repository // Indica que esta é uma classe de repositório
+@Repository
 public interface PersonagemRepository extends MongoRepository<Personagem, String> {
-    // MongoRepository<TipoDaEntidade, TipoDoId>
 
-    // Métodos de consulta personalizados (Spring Data magic!)
+    // Este método busca personagens pelo ID do proprietário (ownerId)
     List<Personagem> findByOwnerId(String ownerId);
 
 
-    List<Personagem> findByTemplateSystemName(String templateSystemName);
 }
