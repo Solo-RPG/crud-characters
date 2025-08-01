@@ -13,8 +13,8 @@ public class Personagem {
     private String ownerId;
     private String nomePersonagem;
     private String fichaId;
-    private String historia; // NOVO CAMPO
-    private String imagem;   // NOVO CAMPO
+    private String historia;
+    private String imagem;
 
     public Personagem() {
     }

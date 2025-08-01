@@ -3,16 +3,18 @@ package com.solo.rpg.characterservice.controller;
 import com.solo.rpg.characterservice.model.Personagem;
 import com.solo.rpg.characterservice.model.PersonagemCreateRequest;
 import com.solo.rpg.characterservice.service.PersonagemService;
-import io.swagger.v3.oas.annotations.Operation; // Mantendo para Swagger, mesmo sem Lombok
-import io.swagger.v3.oas.annotations.Parameter; // Mantendo para Swagger
-import io.swagger.v3.oas.annotations.media.Content; // Mantendo para Swagger
-import io.swagger.v3.oas.annotations.media.Schema; // Mantendo para Swagger
-import io.swagger.v3.oas.annotations.responses.ApiResponse; // Mantendo para Swagger
-import io.swagger.v3.oas.annotations.responses.ApiResponses; // Mantendo para Swagger
-import io.swagger.v3.oas.annotations.tags.Tag; // Mantendo para Swagger
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication; // NOVO IMPORT
+import org.springframework.security.core.context.SecurityContextHolder; // NOVO IMPORT
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -33,7 +35,7 @@ public class PersonagemController {
     }
 
     @Operation(summary = "Criar um novo personagem",
-            description = "Cria um novo personagem com os dados fornecidos. A ligação com a ficha é opcional na criação.")
+            description = "Cria um novo personagem com os dados fornecidos. O ownerId é extraído do token do usuário.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Personagem criado com sucesso",
                     content = @Content(schema = @Schema(implementation = Personagem.class))),
@@ -43,7 +45,11 @@ public class PersonagemController {
     @PostMapping
     public ResponseEntity<Personagem> createPersonagem(@RequestBody PersonagemCreateRequest request) {
         try {
-            Personagem novoPersonagem = personagemService.createPersonagem(request);
+            // EXTRAÇÃO DO E-MAIL DO USUÁRIO LOGADO DO TOKEN
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String ownerEmail = authentication.getName(); // O e-mail é o 'username' no Spring Security
+
+            Personagem novoPersonagem = personagemService.createPersonagem(request, ownerEmail); // PASSA O E-MAIL
             return new ResponseEntity<>(novoPersonagem, HttpStatus.CREATED);
         } catch (ResponseStatusException e) {
             e.printStackTrace();

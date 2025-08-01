@@ -9,6 +9,6 @@ import java.util.Optional;
 
 @Repository
 public interface PersonagemRepository extends MongoRepository<Personagem, String> {
-    // Este método busca personagens pelo ID do proprietário (ownerId)
     List<Personagem> findByOwnerId(String ownerId);
+    Optional<Personagem> findByIdAndOwnerId(String id, String ownerId);
 }
