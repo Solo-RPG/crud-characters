@@ -36,6 +36,7 @@ public class TokenService {
         Map<String, Object> claims = new HashMap<>();
         if (userDetails instanceof User) {
             claims.put("userId", ((User) userDetails).getId());
+            claims.put("name", ((User) userDetails).getName());
         }
         return generateToken(claims, userDetails);
     }
@@ -72,7 +73,7 @@ public class TokenService {
         return extractClaim(token, Claims::getExpiration);
     }
 
-    private Claims extractAllClaims(String token) {
+    public Claims extractAllClaims(String token) {
         return Jwts
                 .parser()
                 .verifyWith(getSignInKey())
@@ -84,5 +85,10 @@ public class TokenService {
     private SecretKey getSignInKey() {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(keyBytes);
+    }
+
+    // Metodo adicional para extrair o ID do usuário do token
+    public String extractUserId(String token) {
+        return extractClaim(token, claims -> claims.get("userId", String.class));
     }
 }

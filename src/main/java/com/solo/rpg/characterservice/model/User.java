@@ -1,5 +1,7 @@
 package com.solo.rpg.characterservice.model;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.security.core.GrantedAuthority;
@@ -14,8 +16,15 @@ import java.util.Objects;
 public class User implements UserDetails {
     @Id
     private String id;
+
+    @NotBlank
     private String name;
+
+    @Email
+    @NotBlank
     private String email;
+
+    @NotBlank
     private String password;
 
     public User() {

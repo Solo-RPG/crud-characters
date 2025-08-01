@@ -1,7 +1,9 @@
 package com.solo.rpg.characterservice.config;
 
+import com.solo.rpg.characterservice.model.User;
 import com.solo.rpg.characterservice.service.UserDetailsServiceImpl;
 import com.solo.rpg.characterservice.service.TokenService;
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -34,6 +36,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
+        System.out.println("→ Filtro JWT chamado para: " + request.getRequestURI());
         final String authHeader = request.getHeader("Authorization");
         final String jwt;
         final String userEmail;
@@ -51,11 +54,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         jwt = authHeader.substring(7);
         userEmail = tokenService.extractUsername(jwt);
 
+        System.out.println("Auth Header: " + authHeader);
+        System.out.println("JWT: " + jwt);
+        System.out.println("Email extraído: " + userEmail);
+
         if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
             if (tokenService.isTokenValid(jwt, userDetails)) {
+                System.out.println("Token válido: " + tokenService.isTokenValid(jwt, userDetails));
+                Claims claims = tokenService.extractAllClaims(jwt);
+
+                // Crie um objeto User com todas as informações necessárias
+                User user = (User) userDetails;
+
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        userDetails,
+                        user, // Agora o principal é seu User completo
                         null,
                         userDetails.getAuthorities()
                 );

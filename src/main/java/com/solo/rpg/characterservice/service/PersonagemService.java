@@ -23,14 +23,14 @@ public class PersonagemService {
         this.personagemRepository = personagemRepository;
     }
 
-    public Personagem createPersonagem(PersonagemCreateRequest request, String ownerEmail) { // RECEBE O E-MAIL COMO PARÂMETRO
+    public Personagem createPersonagem(PersonagemCreateRequest request, String ownerId) { // RECEBE O E-MAIL COMO PARÂMETRO
         if (request.getNomePersonagem() == null || request.getNomePersonagem().isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "nomePersonagem é obrigatório.");
         }
 
         Personagem novoPersonagem = new Personagem();
         novoPersonagem.setId(UUID.randomUUID().toString());
-        novoPersonagem.setOwnerId(ownerEmail); // PREENCHE O ownerId COM O E-MAIL DO USUÁRIO LOGADO
+        novoPersonagem.setOwnerId(ownerId); // PREENCHE O ownerId COM O ID DO USUÁRIO LOGADO
         novoPersonagem.setNomePersonagem(request.getNomePersonagem());
         novoPersonagem.setFichaId(request.getFichaId());
         novoPersonagem.setHistoria(request.getHistoria());

@@ -1,6 +1,7 @@
 package com.solo.rpg.characterservice.config;
 
 import com.solo.rpg.characterservice.repository.UserRepository;
+import com.solo.rpg.characterservice.service.TokenService;
 import com.solo.rpg.characterservice.service.UserDetailsServiceImpl;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
@@ -22,6 +23,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
         scheme = "bearer"
 )
 public class ApplicationConfig {
+
+    @Bean
+    public JwtAuthenticationFilter jwtAuthenticationFilter(TokenService tokenService, UserDetailsService userDetailsService) {
+        return new JwtAuthenticationFilter(tokenService, (UserDetailsServiceImpl) userDetailsService);
+    }
 
     @Bean
     public UserDetailsService userDetailsService(UserRepository userRepository) {

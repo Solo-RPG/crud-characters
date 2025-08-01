@@ -41,6 +41,7 @@ public class SecurityConfig {
                                 "/swagger-ui.html",
                                 "/error"  // Adicionado para permitir erros
                         ).permitAll()
+                        .requestMatchers("/api/characters/**").authenticated()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(sess -> sess
@@ -50,6 +51,9 @@ public class SecurityConfig {
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint((request, response, authException) -> {
+                            response.setHeader("Access-Control-Allow-Origin", "*");
+                            response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+                            response.setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type");
                             response.sendError(403, "Acesso não autorizado: " + authException.getMessage());
                         })
                 );

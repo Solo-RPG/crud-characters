@@ -13,6 +13,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.UUID;
+
 @Service
 public class AuthService {
     private final UserRepository userRepository;
@@ -36,6 +38,7 @@ public class AuthService {
         }
 
         User user = new User();
+        user.setId(UUID.randomUUID().toString());
         user.setName(request.getName());
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
@@ -43,7 +46,7 @@ public class AuthService {
         userRepository.save(user);
 
         String jwtToken = tokenService.generateToken(user);
-        return new AuthResponse(jwtToken);
+        return new AuthResponse(jwtToken, user);
     }
 
     public AuthResponse login(LoginRequest request) {
@@ -62,6 +65,6 @@ public class AuthService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado"));
 
         String jwtToken = tokenService.generateToken(user);
-        return new AuthResponse(jwtToken);
+        return new AuthResponse(jwtToken, user);
     }
 }

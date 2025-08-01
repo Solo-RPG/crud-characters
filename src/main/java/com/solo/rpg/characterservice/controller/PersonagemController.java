@@ -2,19 +2,23 @@ package com.solo.rpg.characterservice.controller;
 
 import com.solo.rpg.characterservice.model.Personagem;
 import com.solo.rpg.characterservice.model.PersonagemCreateRequest;
+import com.solo.rpg.characterservice.model.User;
 import com.solo.rpg.characterservice.service.PersonagemService;
+import io.jsonwebtoken.Claims;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication; // NOVO IMPORT
-import org.springframework.security.core.context.SecurityContextHolder; // NOVO IMPORT
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -35,28 +39,46 @@ public class PersonagemController {
     }
 
     @Operation(summary = "Criar um novo personagem",
-            description = "Cria um novo personagem com os dados fornecidos. O ownerId é extraído do token do usuário.")
+            description = "Cria um novo personagem com os dados fornecidos. O ownerId é extraído do token do usuário.",
+            security = @SecurityRequirement(name = "bearerAuth"))
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Personagem criado com sucesso",
                     content = @Content(schema = @Schema(implementation = Personagem.class))),
             @ApiResponse(responseCode = "400", description = "Dados inválidos fornecidos"),
+            @ApiResponse(responseCode = "401", description = "Não autorizado"),
             @ApiResponse(responseCode = "500", description = "Erro interno no servidor")
     })
     @PostMapping
     public ResponseEntity<Personagem> createPersonagem(@RequestBody PersonagemCreateRequest request) {
+        System.out.println("Authentication: " + SecurityContextHolder.getContext().getAuthentication());
+        System.out.println("Principal: " + SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         try {
-            // EXTRAÇÃO DO E-MAIL DO USUÁRIO LOGADO DO TOKEN
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            String ownerEmail = authentication.getName(); // O e-mail é o 'username' no Spring Security
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            if (auth == null || !auth.isAuthenticated()) {
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuário não autenticado");
+            }
 
-            Personagem novoPersonagem = personagemService.createPersonagem(request, ownerEmail); // PASSA O E-MAIL
+            String ownerId = null;
+            if (auth.getPrincipal() instanceof UserDetails userDetails) {
+                if (userDetails instanceof User user) { // Verifique se é sua classe User
+                    ownerId = user.getId(); // Pegue o ID diretamente
+                } else {
+                    // Se não for sua classe User, tente pegar das claims
+                    ownerId = ((Claims) auth.getCredentials()).get("userId", String.class);
+                }
+            }
+
+            if (ownerId == null) {
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "ID do usuário não encontrado no token");
+            }
+
+            Personagem novoPersonagem = personagemService.createPersonagem(request, ownerId);
             return new ResponseEntity<>(novoPersonagem, HttpStatus.CREATED);
+
         } catch (ResponseStatusException e) {
-            e.printStackTrace();
             throw e;
         } catch (Exception e) {
-            e.printStackTrace();
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Erro inesperado ao criar personagem: " + e.getMessage());
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Erro ao criar personagem: " + e.getMessage());
         }
     }
 
@@ -147,14 +169,11 @@ public class PersonagemController {
             Personagem updatedPersonagem = personagemService.assignFichaToPersonagem(personagemId, fichaId);
             return new ResponseEntity<>(updatedPersonagem, HttpStatus.OK);
         } catch (ResponseStatusException e) {
-            e.printStackTrace();
             throw e;
         } catch (Exception e) {
-            e.printStackTrace();
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Erro ao vincular ficha ao personagem: " + e.getMessage());
         }
     }
-
 
     @Operation(summary = "Excluir um personagem",
             description = "Remove permanentemente um personagem do sistema")
