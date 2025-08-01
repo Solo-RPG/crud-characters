@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -49,9 +50,10 @@ public class PersonagemController {
             @ApiResponse(responseCode = "500", description = "Erro interno no servidor")
     })
     @PostMapping
-    public ResponseEntity<Personagem> createPersonagem(@RequestBody PersonagemCreateRequest request) {
-        System.out.println("Authentication: " + SecurityContextHolder.getContext().getAuthentication());
+    public ResponseEntity<Personagem> createPersonagem(@Valid @RequestBody PersonagemCreateRequest request) {
+        System.out.println("Authentication para createPersonagem: " + SecurityContextHolder.getContext().getAuthentication());
         System.out.println("Principal: " + SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+        System.out.println("Payload recebido: " + request.getNomePersonagem() + request.getHistoria() + request.getImagem());
         try {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             if (auth == null || !auth.isAuthenticated()) {
@@ -120,9 +122,6 @@ public class PersonagemController {
             @Parameter(description = "ID do proprietário dos personagens", required = true)
             @PathVariable String ownerId) {
         List<Personagem> personagens = personagemService.getPersonagensByOwnerId(ownerId);
-        if (personagens.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Nenhum personagem encontrado para o proprietário: " + ownerId);
-        }
         return new ResponseEntity<>(personagens, HttpStatus.OK);
     }
 
