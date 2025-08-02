@@ -1,0 +1,5 @@
+# application.properties.template (pode ser commitado)
+spring.application.name=crudCharacters
+server.port=8002
+spring.data.mongodb.uri=${MONGO_URI}
+application.security.jwt.secret-key=${JWT_SECRET}
