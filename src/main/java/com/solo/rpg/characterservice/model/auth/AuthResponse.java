@@ -1,4 +1,4 @@
-package com.solo.rpg.characterservice.model;
+package com.solo.rpg.characterservice.model.auth;
 
 // requisição de autenticação
 public class AuthResponse {

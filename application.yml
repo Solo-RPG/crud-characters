@@ -1,0 +1,58 @@
+spring:
+  application:
+    name: crudCharacters
+  config:
+    activate:
+      on-profile: dev
+  data:
+    mongodb:
+      uri: ${MONGO_URI:mongodb://localhost:27017/rpgdb}
+      database: rpgdb
+
+server:
+  port: 8002
+  servlet:
+    context-path: /api
+
+application:
+  security:
+    jwt:
+      secret-key: ${JWT_SECRET} # Chave padrão para dev
+      expiration: ${APPLICATION_SECURITY_JWT_EXPIRATION} # 24 horas em milissegundos
+
+logging:
+  level:
+    root: INFO
+    org.springframework.web: DEBUG
+    com.solo.rpg: DEBUG
+
+---
+# Configuração de produção
+spring:
+  config:
+    activate:
+      on-profile: prod
+  data:
+    mongodb:
+      uri: ${MONGO_URI}
+      auto-index-creation: false
+
+application:
+  security:
+    jwt:
+      secret-key: ${JWT_SECRET}
+
+logging:
+  level:
+    root: WARN
+    org.springframework.web: WARN
+
+---
+# Configuração de teste
+spring:
+  config:
+    activate:
+      on-profile: test
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/rpgdb-test

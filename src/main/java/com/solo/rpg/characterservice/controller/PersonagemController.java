@@ -1,8 +1,8 @@
 package com.solo.rpg.characterservice.controller;
 
-import com.solo.rpg.characterservice.model.Personagem;
-import com.solo.rpg.characterservice.model.PersonagemCreateRequest;
-import com.solo.rpg.characterservice.model.User;
+import com.solo.rpg.characterservice.model.character.Personagem;
+import com.solo.rpg.characterservice.model.character.PersonagemCreateRequest;
+import com.solo.rpg.characterservice.model.auth.User;
 import com.solo.rpg.characterservice.service.PersonagemService;
 import io.jsonwebtoken.Claims;
 import io.swagger.v3.oas.annotations.Operation;

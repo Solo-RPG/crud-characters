@@ -1,9 +1,9 @@
 package com.solo.rpg.characterservice.service;
 
-import com.solo.rpg.characterservice.model.AuthResponse;
-import com.solo.rpg.characterservice.model.LoginRequest;
-import com.solo.rpg.characterservice.model.RegisterRequest;
-import com.solo.rpg.characterservice.model.User;
+import com.solo.rpg.characterservice.model.auth.AuthResponse;
+import com.solo.rpg.characterservice.model.auth.LoginRequest;
+import com.solo.rpg.characterservice.model.auth.RegisterRequest;
+import com.solo.rpg.characterservice.model.auth.User;
 import com.solo.rpg.characterservice.repository.UserRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;

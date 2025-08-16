@@ -1,6 +1,6 @@
 package com.solo.rpg.characterservice.service;
 
-import com.solo.rpg.characterservice.model.User;
+import com.solo.rpg.characterservice.model.auth.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;

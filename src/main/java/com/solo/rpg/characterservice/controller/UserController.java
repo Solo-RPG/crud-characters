@@ -1,6 +1,6 @@
 package com.solo.rpg.characterservice.controller;
 
-import com.solo.rpg.characterservice.model.User;
+import com.solo.rpg.characterservice.model.auth.User;
 import com.solo.rpg.characterservice.repository.UserRepository;
 import com.solo.rpg.characterservice.service.TokenService;
 import io.swagger.v3.oas.annotations.Operation;

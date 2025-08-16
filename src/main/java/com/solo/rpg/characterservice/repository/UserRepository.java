@@ -1,6 +1,6 @@
 package com.solo.rpg.characterservice.repository;
 
-import com.solo.rpg.characterservice.model.User;
+import com.solo.rpg.characterservice.model.auth.User;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 

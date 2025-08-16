@@ -1,4 +1,4 @@
-package com.solo.rpg.characterservice.model;
+package com.solo.rpg.characterservice.model.character;
 
 public class PersonagemCreateRequest {
     private String nomePersonagem;

@@ -1,7 +1,7 @@
 package com.solo.rpg.characterservice.service;
 
-import com.solo.rpg.characterservice.model.Personagem;
-import com.solo.rpg.characterservice.model.PersonagemCreateRequest;
+import com.solo.rpg.characterservice.model.character.Personagem;
+import com.solo.rpg.characterservice.model.character.PersonagemCreateRequest;
 import com.solo.rpg.characterservice.repository.PersonagemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

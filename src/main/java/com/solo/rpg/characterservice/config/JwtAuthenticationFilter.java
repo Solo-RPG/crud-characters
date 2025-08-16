@@ -1,6 +1,6 @@
 package com.solo.rpg.characterservice.config;
 
-import com.solo.rpg.characterservice.model.User;
+import com.solo.rpg.characterservice.model.auth.User;
 import com.solo.rpg.characterservice.service.UserDetailsServiceImpl;
 import com.solo.rpg.characterservice.service.TokenService;
 import io.jsonwebtoken.Claims;

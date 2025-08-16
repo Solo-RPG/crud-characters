@@ -1,6 +1,5 @@
 package com.solo.rpg.characterservice.service;
 
-import com.solo.rpg.characterservice.model.User;
 import com.solo.rpg.characterservice.repository.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

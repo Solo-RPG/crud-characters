@@ -3,3 +3,4 @@ spring.application.name=crudCharacters
 server.port=8002
 spring.data.mongodb.uri=${MONGO_URI}
 application.security.jwt.secret-key=${JWT_SECRET}
+application.security.jwt.expiration=${APPLICATION_SECURITY_JWT_EXPIRATION}

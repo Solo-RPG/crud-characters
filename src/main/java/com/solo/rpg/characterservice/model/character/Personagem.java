@@ -1,4 +1,4 @@
-package com.solo.rpg.characterservice.model;
+package com.solo.rpg.characterservice.model.character;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
