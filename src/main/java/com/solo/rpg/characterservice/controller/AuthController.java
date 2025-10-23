@@ -28,7 +28,7 @@ public class AuthController {
         try {
             return ResponseEntity.ok(authService.register(request));
         } catch (Exception e) {
-            // Logar o erro
+            System.out.println("Error during registration: " + e.getMessage());
             return ResponseEntity.badRequest().build(); // ou retornar um ErrorResponse
         }
     }
