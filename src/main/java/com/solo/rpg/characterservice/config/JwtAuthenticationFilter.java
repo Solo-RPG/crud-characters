@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -17,12 +18,18 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.List;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final TokenService tokenService;
     private final UserDetailsServiceImpl userDetailsService;
+
+    private static final List<String> TRUSTED_ORIGINS = List.of(
+            "http://localhost:9000",
+            "http://localhost:7000"
+    );
 
     public JwtAuthenticationFilter(TokenService tokenService,
                                    UserDetailsServiceImpl userDetailsService) {
@@ -40,6 +47,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         final String authHeader = request.getHeader("Authorization");
         final String jwt;
         final String userEmail;
+
+        String origin = request.getHeader("Origin");
+
+        // Se a requisição vem de uma origem confiável, autentica automaticamente
+        if (origin != null && TRUSTED_ORIGINS.contains(origin)) {
+            UsernamePasswordAuthenticationToken authToken =
+                    new UsernamePasswordAuthenticationToken(
+                            "trusted-origin",
+                            null,
+                            List.of(new SimpleGrantedAuthority("USER"))
+                    );
+            authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            SecurityContextHolder.getContext().setAuthentication(authToken);
+
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         if (request.getServletPath().contains("/api/auth")) {
             filterChain.doFilter(request, response);
